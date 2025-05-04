@@ -43,7 +43,7 @@ def avatar_name_to_id(text: str, color: tuple) -> str:
     cleaned_text = text.strip().replace('\n', '').split()[0]
     
     if cleaned_text == "Rover":
-        if is_color_in_range(color, (255, 255, 255)): # Aero
+        if is_color_in_range(color, (110, 145, 138)): # Aero
             return "1408"
         elif is_color_in_range(color, (137, 49, 110)): # Havoc
             return "1604"
