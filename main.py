@@ -11,6 +11,8 @@ from data.weapon_names import WEAPON_NAMES
 from data.mainstats import MAINSTATS
 from data.substats import SUBSTATS
 
+custom_config = r'--oem 3 --psm 7'
+
 app = FastAPI()
 
 app.add_middleware(
@@ -85,22 +87,41 @@ def mainstat_translate(text: str) -> str | None:
     
     return None
 
-def substat_translate(text: str) -> str | None:
+def substat_translate(text: str, has_percent: bool) -> str | None:
     cleaned_text = text.strip()
     
     if cleaned_text in SUBSTATS:
+        if cleaned_text in ("HP", "ATK", "DEF"):
+            if has_percent:
+                return cleaned_text
+            else:
+                return f"_{cleaned_text}"
         return SUBSTATS[cleaned_text]
     
     # If no exact match, try fuzzy matching
     matches = get_close_matches(cleaned_text, SUBSTATS.keys(), n=1, cutoff=0.8)
     if matches:
+        if matches[0] in ("HP", "ATK", "DEF"):
+            if has_percent:
+                return matches[0]
+            else:
+                return f"_{matches[0]}"
         return SUBSTATS[matches[0]]
     
     return None
 
-def value_translate(text: str) -> str | None:
+def value_translate(text: str) -> tuple[str | None, bool]:
     cleaned_text = text.strip()
-    return None
+    has_percent = cleaned_text.endswith('%')
+
+    if has_percent:
+        cleaned_text = cleaned_text[:-1].strip()
+
+    try:
+        float(cleaned_text)
+        return cleaned_text, has_percent
+    except ValueError:
+        return None, has_percent
 
 @app.post("/ocr/")
 async def ocr(file: UploadFile = File(...)):
@@ -118,66 +139,91 @@ async def ocr(file: UploadFile = File(...)):
     avatar_name = image_to_string(image.crop(CROPS["avatar_name"]))
     avatar_color = get_average_color(image.crop(CROPS["avatar_color"]))
     weapon_name = image_to_string(image.crop(CROPS["weapon_name"]))
-    echo0_main = image_to_string(image.crop(CROPS["echo0_main"]))
-    echo0_sub0 = image_to_string(image.crop(CROPS["echo0_sub0"]))
-    echo0_val0 = image_to_string(image.crop(CROPS["echo0_val0"]))
-    echo0_sub1 = image_to_string(image.crop(CROPS["echo0_sub1"]))
-    echo0_val1 = image_to_string(image.crop(CROPS["echo0_val1"]))
-    echo0_sub2 = image_to_string(image.crop(CROPS["echo0_sub2"]))
-    echo0_val2 = image_to_string(image.crop(CROPS["echo0_val2"]))
-    echo0_sub3 = image_to_string(image.crop(CROPS["echo0_sub3"]))
-    echo0_val3 = image_to_string(image.crop(CROPS["echo0_val3"]))
-    echo0_sub4 = image_to_string(image.crop(CROPS["echo0_sub4"]))
-    echo0_val4 = image_to_string(image.crop(CROPS["echo0_val4"]))
+    echo0_main = image_to_string(image.crop(CROPS["echo0_main"]), config=custom_config)
+    echo0_sub0 = image_to_string(image.crop(CROPS["echo0_sub0"]), config=custom_config)
+    echo0_val0 = image_to_string(image.crop(CROPS["echo0_val0"]), config=custom_config)
+    converted0_sub0 = value_translate(echo0_val0)
+    echo0_sub1 = image_to_string(image.crop(CROPS["echo0_sub1"]), config=custom_config)
+    echo0_val1 = image_to_string(image.crop(CROPS["echo0_val1"]), config=custom_config)
+    converted0_sub1 = value_translate(echo0_val1)
+    echo0_sub2 = image_to_string(image.crop(CROPS["echo0_sub2"]), config=custom_config)
+    echo0_val2 = image_to_string(image.crop(CROPS["echo0_val2"]), config=custom_config)
+    converted0_sub2 = value_translate(echo0_val2)
+    echo0_sub3 = image_to_string(image.crop(CROPS["echo0_sub3"]), config=custom_config)
+    echo0_val3 = image_to_string(image.crop(CROPS["echo0_val3"]), config=custom_config)
+    converted0_sub3 = value_translate(echo0_val3)
+    echo0_sub4 = image_to_string(image.crop(CROPS["echo0_sub4"]), config=custom_config)
+    echo0_val4 = image_to_string(image.crop(CROPS["echo0_val4"]), config=custom_config)
+    converted0_sub4 = value_translate(echo0_val4)
 
-    echo1_main = image_to_string(image.crop(CROPS["echo1_main"]))
-    echo1_sub0 = image_to_string(image.crop(CROPS["echo1_sub0"]))
-    echo1_val0 = image_to_string(image.crop(CROPS["echo1_val0"]))
-    echo1_sub1 = image_to_string(image.crop(CROPS["echo1_sub1"]))
-    echo1_val1 = image_to_string(image.crop(CROPS["echo1_val1"]))
-    echo1_sub2 = image_to_string(image.crop(CROPS["echo1_sub2"]))
-    echo1_val2 = image_to_string(image.crop(CROPS["echo1_val2"]))
-    echo1_sub3 = image_to_string(image.crop(CROPS["echo1_sub3"]))
-    echo1_val3 = image_to_string(image.crop(CROPS["echo1_val3"]))
-    echo1_sub4 = image_to_string(image.crop(CROPS["echo1_sub4"]))
-    echo1_val4 = image_to_string(image.crop(CROPS["echo1_val4"]))
+    echo1_main = image_to_string(image.crop(CROPS["echo1_main"]), config=custom_config)
+    echo1_sub0 = image_to_string(image.crop(CROPS["echo1_sub0"]), config=custom_config)
+    echo1_val0 = image_to_string(image.crop(CROPS["echo1_val0"]), config=custom_config)
+    converted1_sub0 = value_translate(echo1_val0)
+    echo1_sub1 = image_to_string(image.crop(CROPS["echo1_sub1"]), config=custom_config)
+    echo1_val1 = image_to_string(image.crop(CROPS["echo1_val1"]), config=custom_config)
+    converted1_sub1 = value_translate(echo1_val1)
+    echo1_sub2 = image_to_string(image.crop(CROPS["echo1_sub2"]), config=custom_config)
+    echo1_val2 = image_to_string(image.crop(CROPS["echo1_val2"]), config=custom_config)
+    converted1_sub2 = value_translate(echo1_val2)
+    echo1_sub3 = image_to_string(image.crop(CROPS["echo1_sub3"]), config=custom_config)
+    echo1_val3 = image_to_string(image.crop(CROPS["echo1_val3"]), config=custom_config)
+    converted1_sub3 = value_translate(echo1_val3)
+    echo1_sub4 = image_to_string(image.crop(CROPS["echo1_sub4"]), config=custom_config)
+    echo1_val4 = image_to_string(image.crop(CROPS["echo1_val4"]), config=custom_config)
+    converted1_sub4 = value_translate(echo1_val4)
     
-    echo2_main = image_to_string(image.crop(CROPS["echo2_main"]))
-    echo2_sub0 = image_to_string(image.crop(CROPS["echo2_sub0"]))
-    echo2_val0 = image_to_string(image.crop(CROPS["echo2_val0"]))
-    echo2_sub1 = image_to_string(image.crop(CROPS["echo2_sub1"]))
-    echo2_val1 = image_to_string(image.crop(CROPS["echo2_val1"]))
-    echo2_sub2 = image_to_string(image.crop(CROPS["echo2_sub2"]))
-    echo2_val2 = image_to_string(image.crop(CROPS["echo2_val2"]))
-    echo2_sub3 = image_to_string(image.crop(CROPS["echo2_sub3"]))
-    echo2_val3 = image_to_string(image.crop(CROPS["echo2_val3"]))
-    echo2_sub4 = image_to_string(image.crop(CROPS["echo2_sub4"]))
-    echo2_val4 = image_to_string(image.crop(CROPS["echo2_val4"]))
+    echo2_main = image_to_string(image.crop(CROPS["echo2_main"]), config=custom_config)
+    echo2_sub0 = image_to_string(image.crop(CROPS["echo2_sub0"]), config=custom_config)
+    echo2_val0 = image_to_string(image.crop(CROPS["echo2_val0"]), config=custom_config)
+    converted2_sub0 = value_translate(echo2_val0)
+    echo2_sub1 = image_to_string(image.crop(CROPS["echo2_sub1"]), config=custom_config)
+    echo2_val1 = image_to_string(image.crop(CROPS["echo2_val1"]), config=custom_config)
+    converted2_sub1 = value_translate(echo2_val1)
+    echo2_sub2 = image_to_string(image.crop(CROPS["echo2_sub2"]), config=custom_config)
+    echo2_val2 = image_to_string(image.crop(CROPS["echo2_val2"]), config=custom_config)
+    converted2_sub2 = value_translate(echo2_val2)
+    echo2_sub3 = image_to_string(image.crop(CROPS["echo2_sub3"]), config=custom_config)
+    echo2_val3 = image_to_string(image.crop(CROPS["echo2_val3"]), config=custom_config)
+    converted2_sub3 = value_translate(echo2_val3)
+    echo2_sub4 = image_to_string(image.crop(CROPS["echo2_sub4"]), config=custom_config)
+    echo2_val4 = image_to_string(image.crop(CROPS["echo2_val4"]), config=custom_config)
+    converted2_sub4 = value_translate(echo2_val4)
 
-    echo3_main = image_to_string(image.crop(CROPS["echo3_main"]))
-    echo3_sub0 = image_to_string(image.crop(CROPS["echo3_sub0"]))
-    echo3_val0 = image_to_string(image.crop(CROPS["echo3_val0"]))
-    echo3_sub1 = image_to_string(image.crop(CROPS["echo3_sub1"]))
-    echo3_val1 = image_to_string(image.crop(CROPS["echo3_val1"]))
-    echo3_sub2 = image_to_string(image.crop(CROPS["echo3_sub2"]))
-    echo3_val2 = image_to_string(image.crop(CROPS["echo3_val2"]))
-    echo3_sub3 = image_to_string(image.crop(CROPS["echo3_sub3"]))
-    echo3_val3 = image_to_string(image.crop(CROPS["echo3_val3"]))
-    echo3_sub4 = image_to_string(image.crop(CROPS["echo3_sub4"]))
-    echo3_val4 = image_to_string(image.crop(CROPS["echo3_val4"]))
+    echo3_main = image_to_string(image.crop(CROPS["echo3_main"]), config=custom_config)
+    echo3_sub0 = image_to_string(image.crop(CROPS["echo3_sub0"]), config=custom_config)
+    echo3_val0 = image_to_string(image.crop(CROPS["echo3_val0"]), config=custom_config)
+    converted3_sub0 = value_translate(echo3_val0)
+    echo3_sub1 = image_to_string(image.crop(CROPS["echo3_sub1"]), config=custom_config)
+    echo3_val1 = image_to_string(image.crop(CROPS["echo3_val1"]), config=custom_config)
+    converted3_sub1 = value_translate(echo3_val1)
+    echo3_sub2 = image_to_string(image.crop(CROPS["echo3_sub2"]), config=custom_config)
+    echo3_val2 = image_to_string(image.crop(CROPS["echo3_val2"]), config=custom_config)
+    converted3_sub2 = value_translate(echo3_val2)
+    echo3_sub3 = image_to_string(image.crop(CROPS["echo3_sub3"]), config=custom_config)
+    echo3_val3 = image_to_string(image.crop(CROPS["echo3_val3"]), config=custom_config)
+    converted3_sub3 = value_translate(echo3_val3)
+    echo3_sub4 = image_to_string(image.crop(CROPS["echo3_sub4"]), config=custom_config)
+    echo3_val4 = image_to_string(image.crop(CROPS["echo3_val4"]), config=custom_config)
+    converted3_sub4 = value_translate(echo3_val4)
 
-    echo4_main = image_to_string(image.crop(CROPS["echo4_main"]))
-    echo4_sub0 = image_to_string(image.crop(CROPS["echo4_sub0"]))
-    echo4_val0 = image_to_string(image.crop(CROPS["echo4_val0"]))
-    echo4_sub1 = image_to_string(image.crop(CROPS["echo4_sub1"]))
-    echo4_val1 = image_to_string(image.crop(CROPS["echo4_val1"]))
-    echo4_sub2 = image_to_string(image.crop(CROPS["echo4_sub2"]))
-    echo4_val2 = image_to_string(image.crop(CROPS["echo4_val2"]))
-    echo4_sub3 = image_to_string(image.crop(CROPS["echo4_sub3"]))
-    echo4_val3 = image_to_string(image.crop(CROPS["echo4_val3"]))
-    echo4_sub4 = image_to_string(image.crop(CROPS["echo4_sub4"]))
-    echo4_val4 = image_to_string(image.crop(CROPS["echo4_val4"]))
-    
+    echo4_main = image_to_string(image.crop(CROPS["echo4_main"]), config=custom_config)
+    echo4_sub0 = image_to_string(image.crop(CROPS["echo4_sub0"]), config=custom_config)
+    echo4_val0 = image_to_string(image.crop(CROPS["echo4_val0"]), config=custom_config)
+    converted4_sub0 = value_translate(echo4_val0)
+    echo4_sub1 = image_to_string(image.crop(CROPS["echo4_sub1"]), config=custom_config)
+    echo4_val1 = image_to_string(image.crop(CROPS["echo4_val1"]), config=custom_config)
+    converted4_sub1 = value_translate(echo4_val1)
+    echo4_sub2 = image_to_string(image.crop(CROPS["echo4_sub2"]), config=custom_config)
+    echo4_val2 = image_to_string(image.crop(CROPS["echo4_val2"]), config=custom_config)
+    converted4_sub2 = value_translate(echo4_val2)
+    echo4_sub3 = image_to_string(image.crop(CROPS["echo4_sub3"]), config=custom_config)
+    echo4_val3 = image_to_string(image.crop(CROPS["echo4_val3"]), config=custom_config)
+    converted4_sub3 = value_translate(echo4_val3)
+    echo4_sub4 = image_to_string(image.crop(CROPS["echo4_sub4"]), config=custom_config)
+    echo4_val4 = image_to_string(image.crop(CROPS["echo4_val4"]), config=custom_config)
+    converted4_sub4 = value_translate(echo4_val4)
+
     return JSONResponse(content={
         "data": {
             "id": avatar_name_to_id(avatar_name, avatar_color),
@@ -190,130 +236,130 @@ async def ocr(file: UploadFile = File(...)):
                     "stat": mainstat_translate(echo0_main),
                     "statList": [
                         {
-                            "stat": substat_translate(echo0_sub0),
-                            "value": value_translate(echo0_val0),
+                            "stat": substat_translate(echo0_sub0, converted0_sub0[1]),
+                            "value": converted0_sub0[0],
                         },
                         {
-                            "stat": substat_translate(echo0_sub1),
-                            "value": value_translate(echo0_val1),
+                            "stat": substat_translate(echo0_sub1, converted0_sub1[1]),
+                            "value": converted0_sub1[0],
                         },
                         {
-                            "stat": substat_translate(echo0_sub2),
-                            "value": value_translate(echo0_val2),
+                            "stat": substat_translate(echo0_sub2, converted0_sub2[1]),
+                            "value": converted0_sub2[0],
                         },
                         {
-                            "stat": substat_translate(echo0_sub3),
-                            "value": value_translate(echo0_val3),
+                            "stat": substat_translate(echo0_sub3, converted0_sub3[1]),
+                            "value": converted0_sub3[0],
                         },
                         {
-                            "stat": substat_translate(echo0_sub4),
-                            "value": value_translate(echo0_val4),
+                            "stat": substat_translate(echo0_sub4, converted0_sub4[1]),
+                            "value": converted0_sub4[0],
                         },
-                    ]
+                    ],
                 },
                 {
                     "setId": "001",
                     "stat": mainstat_translate(echo1_main),
                     "statList": [
                         {
-                            "stat": substat_translate(echo1_sub0),
-                            "value": value_translate(echo1_val0),
+                            "stat": substat_translate(echo1_sub0, converted1_sub0[1]),
+                            "value": converted1_sub0[0],
                         },
                         {
-                            "stat": substat_translate(echo1_sub1),
-                            "value": value_translate(echo1_val1),
+                            "stat": substat_translate(echo1_sub1, converted1_sub1[1]),
+                            "value": converted1_sub1[0],
                         },
                         {
-                            "stat": substat_translate(echo1_sub2),
-                            "value": value_translate(echo1_val2),
+                            "stat": substat_translate(echo1_sub2, converted1_sub2[1]),
+                            "value": converted1_sub2[0],
                         },
                         {
-                            "stat": substat_translate(echo1_sub3),
-                            "value": value_translate(echo1_val3),
+                            "stat": substat_translate(echo1_sub3, converted1_sub3[1]),
+                            "value": converted1_sub3[0],
                         },
                         {
-                            "stat": substat_translate(echo1_sub4),
-                            "value": value_translate(echo1_val4),
+                            "stat": substat_translate(echo1_sub4, converted1_sub4[1]),
+                            "value": converted1_sub4[0],
                         },
-                    ]
+                    ],
                 },
                 {
                     "setId": "001",
                     "stat": mainstat_translate(echo2_main),
                     "statList": [
                         {
-                            "stat": substat_translate(echo2_sub0),
-                            "value": value_translate(echo2_val0),
+                            "stat": substat_translate(echo2_sub0, converted2_sub0[1]),
+                            "value": converted2_sub0[0],
                         },
                         {
-                            "stat": substat_translate(echo2_sub1),
-                            "value": value_translate(echo2_val1),
+                            "stat": substat_translate(echo2_sub1, converted2_sub1[1]),
+                            "value": converted2_sub1[0],
                         },
                         {
-                            "stat": substat_translate(echo2_sub2),
-                            "value": value_translate(echo2_val2),
+                            "stat": substat_translate(echo2_sub2, converted2_sub2[1]),
+                            "value": converted2_sub2[0],
                         },
                         {
-                            "stat": substat_translate(echo2_sub3),
-                            "value": value_translate(echo2_val3),
+                            "stat": substat_translate(echo2_sub3, converted2_sub3[1]),
+                            "value": converted2_sub3[0],
                         },
                         {
-                            "stat": substat_translate(echo2_sub4),
-                            "value": value_translate(echo2_val4),
+                            "stat": substat_translate(echo2_sub4, converted2_sub4[1]),
+                            "value": converted2_sub4[0],
                         },
-                    ]
+                    ],
                 },
                 {
                     "setId": "001",
                     "stat": mainstat_translate(echo3_main),
                     "statList": [
                         {
-                            "stat": substat_translate(echo3_sub0),
-                            "value": value_translate(echo3_val0),
+                            "stat": substat_translate(echo3_sub0, converted3_sub0[1]),
+                            "value": converted3_sub0[0],
                         },
                         {
-                            "stat": substat_translate(echo3_sub1),
-                            "value": value_translate(echo3_val1),
+                            "stat": substat_translate(echo3_sub1, converted3_sub1[1]),
+                            "value": converted3_sub1[0],
                         },
                         {
-                            "stat": substat_translate(echo3_sub2),
-                            "value": value_translate(echo3_val2),
+                            "stat": substat_translate(echo3_sub2, converted3_sub2[1]),
+                            "value": converted3_sub2[0],
                         },
                         {
-                            "stat": substat_translate(echo3_sub3),
-                            "value": value_translate(echo3_val3),
+                            "stat": substat_translate(echo3_sub3, converted3_sub3[1]),
+                            "value": converted3_sub3[0],
                         },
                         {
-                            "stat": substat_translate(echo3_sub4),
-                            "value": value_translate(echo3_val4),
+                            "stat": substat_translate(echo3_sub4, converted3_sub4[1]),
+                            "value": converted3_sub4[0],
                         },
-                    ]
+                    ],
                 },
                 {
                     "setId": "001",
                     "stat": mainstat_translate(echo4_main),
                     "statList": [
                         {
-                            "stat": substat_translate(echo4_sub0),
-                            "value": value_translate(echo4_val0),
+                            "stat": substat_translate(echo4_sub0, converted4_sub0[1]),
+                            "value": converted4_sub0[0],
                         },
                         {
-                            "stat": substat_translate(echo4_sub1),
-                            "value": value_translate(echo4_val1),
+                            "stat": substat_translate(echo4_sub1, converted4_sub1[1]),
+                            "value": converted4_sub1[0],
                         },
                         {
-                            "stat": substat_translate(echo4_sub2),
-                            "value": value_translate(echo4_val2),
+                            "stat": substat_translate(echo4_sub2, converted4_sub2[1]),
+                            "value": converted4_sub2[0],
                         },
                         {
-                            "stat": substat_translate(echo4_sub3),
-                            "value": value_translate(echo4_val3),
+                            "stat": substat_translate(echo4_sub3, converted4_sub3[1]),
+                            "value": converted4_sub3[0],
                         },
                         {
-                            "stat": substat_translate(echo4_sub4),
-                            "value": value_translate(echo4_val4),
+                            "stat": substat_translate(echo4_sub4, converted4_sub4[1]),
+                            "value": converted4_sub4[0],
                         },
-                    ]
+                    ],
                 },
             ],
         },
@@ -326,22 +372,132 @@ async def ocr(file: UploadFile = File(...)):
                 {
                     "setId": "001",
                     "stat": echo0_main,
+                    "statList": [
+                        {
+                            "stat": echo0_sub0,
+                            "value": echo0_val0,
+                        },
+                        {
+                            "stat": echo0_sub1,
+                            "value": echo0_val1,
+                        },
+                        {
+                            "stat": echo0_sub2,
+                            "value": echo0_val2,
+                        },
+                        {
+                            "stat": echo0_sub3,
+                            "value": echo0_val3,
+                        },
+                        {
+                            "stat": echo0_sub4,
+                            "value": echo0_val4,
+                        },
+                    ],
                 },
                 {
                     "setId": "001",
                     "stat": echo1_main,
+                    "statList": [
+                        {
+                            "stat": echo1_sub0,
+                            "value": echo1_val0,
+                        },
+                        {
+                            "stat": echo1_sub1,
+                            "value": echo1_val1,
+                        },
+                        {
+                            "stat": echo1_sub2,
+                            "value": echo1_val2,
+                        },
+                        {
+                            "stat": echo1_sub3,
+                            "value": echo1_val3,
+                        },
+                        {
+                            "stat": echo1_sub4,
+                            "value": echo1_val4,
+                        },
+                    ],
                 },
                 {
                     "setId": "001",
                     "stat": echo2_main,
+                    "statList": [
+                        {
+                            "stat": echo2_sub0,
+                            "value": echo2_val0,
+                        },
+                        {
+                            "stat": echo2_sub1,
+                            "value": echo2_val1,
+                        },
+                        {
+                            "stat": echo2_sub2,
+                            "value": echo2_val2,
+                        },
+                        {
+                            "stat": echo2_sub3,
+                            "value": echo2_val3,
+                        },
+                        {
+                            "stat": echo2_sub4,
+                            "value": echo2_val4,
+                        },
+                    ],
                 },
                 {
                     "setId": "001",
                     "stat": echo3_main,
+                    "statList": [
+                        {
+                            "stat": echo3_sub0,
+                            "value": echo3_val0,
+                        },
+                        {
+                            "stat": echo3_sub1,
+                            "value": echo3_val1,
+                        },
+                        {
+                            "stat": echo3_sub2,
+                            "value": echo3_val2,
+                        },
+                        {
+                            "stat": echo3_sub3,
+                            "value": echo3_val3,
+                        },
+                        {
+                            "stat": echo3_sub4,
+                            "value": echo3_val4,
+                        },
+                    ],
                 },
                 {
                     "setId": "001",
                     "stat": echo4_main,
+                    "statList": [
+                        {
+                            "stat": echo4_sub0,
+                            "value": echo4_val0,
+                        },
+                        {
+                            "stat": echo4_sub1,
+                            "value": echo4_val1,
+                        },
+                        {
+                            "stat": echo4_sub2,
+                            "value": echo4_val2,
+                        },
+                        {
+                            "stat": echo4_sub3,
+                            "value": echo4_val3,
+                        },
+                        {
+                            "stat": echo4_sub4,
+                            "value": echo4_val4,
+                        },
+                    ],
                 },
             ],
         },
