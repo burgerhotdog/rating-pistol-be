@@ -5,18 +5,10 @@ from pytesseract import image_to_string
 from PIL import Image
 import io
 from difflib import get_close_matches
-import json
-
-# Character name crop coordinates (left, top, right, bottom)
-AVATAR_NAME_CROP = (65, 19, 620, 84)
-WEAPON_NAME_CROP = (1600, 455, 1818, 485)
-
-# Valid character names
-with open('AVATAR_NAMES.json', 'r') as f:
-    AVATAR_NAMES = json.load(f)
-
-with open('WEAPON_NAMES.json', 'r') as f:
-    WEAPON_NAMES = json.load(f)
+from data.crops import CROPS
+from data.avatar_names import AVATAR_NAMES
+from data.weapon_names import WEAPON_NAMES
+from data.mainstats import MAINSTATS
 
 app = FastAPI()
 
@@ -79,6 +71,19 @@ def weapon_name_to_id(text: str) -> str:
     
     return "Unknown"
 
+def mainstat_translate(text: str) -> str | None:
+    cleaned_text = text.strip()
+    
+    if cleaned_text in MAINSTATS:
+        return MAINSTATS[cleaned_text]
+    
+    # If no exact match, try fuzzy matching
+    matches = get_close_matches(cleaned_text, MAINSTATS.keys(), n=1, cutoff=0.8)
+    if matches:
+        return MAINSTATS[matches[0]]
+    
+    return None
+
 @app.post("/ocr/")
 async def ocr(file: UploadFile = File(...)):
     contents = await file.read()
@@ -92,19 +97,70 @@ async def ocr(file: UploadFile = File(...)):
         )
     
     # Process Crops
-    avatar_name = image_to_string(image.crop(AVATAR_NAME_CROP))
-    avatar_color = get_average_color(image.crop((20, 30, 60, 70)))
-    weapon_name = image_to_string(image.crop(WEAPON_NAME_CROP))
+    avatar_name = image_to_string(image.crop(CROPS["avatar_name"]))
+    avatar_color = get_average_color(image.crop(CROPS["avatar_color"]))
+    weapon_name = image_to_string(image.crop(CROPS["weapon_name"]))
+    echo0_main = image_to_string(image.crop(CROPS["echo0_main"]))
+    echo1_main = image_to_string(image.crop(CROPS["echo1_main"]))
+    echo2_main = image_to_string(image.crop(CROPS["echo2_main"]))
+    echo3_main = image_to_string(image.crop(CROPS["echo3_main"]))
+    echo4_main = image_to_string(image.crop(CROPS["echo4_main"]))
     
     return JSONResponse(content={
         "data": {
             "id": avatar_name_to_id(avatar_name, avatar_color),
             "level": 90,
             "weaponId": weapon_name_to_id(weapon_name),
+            "weaponLevel": 90,
+            "equipList": [
+                {
+                    "setId": "001",
+                    "stat": mainstat_translate(echo0_main),
+                },
+                {
+                    "setId": "001",
+                    "stat": mainstat_translate(echo1_main),
+                },
+                {
+                    "setId": "001",
+                    "stat": mainstat_translate(echo2_main),
+                },
+                {
+                    "setId": "001",
+                    "stat": mainstat_translate(echo3_main),
+                },
+                {
+                    "setId": "001",
+                    "stat": mainstat_translate(echo4_main),
+                },
+            ],
         },
         "raw_data": {
             "id": avatar_name,
             "level": 90,
-            "weaponId": weapon_name
-        }
+            "weaponId": weapon_name,
+            "weaponLevel": 90,
+            "equipList": [
+                {
+                    "setId": "001",
+                    "stat": echo0_main,
+                },
+                {
+                    "setId": "001",
+                    "stat": echo1_main,
+                },
+                {
+                    "setId": "001",
+                    "stat": echo2_main,
+                },
+                {
+                    "setId": "001",
+                    "stat": echo3_main,
+                },
+                {
+                    "setId": "001",
+                    "stat": echo4_main,
+                },
+            ],
+        },
     })
