@@ -9,10 +9,14 @@ import json
 
 # Character name crop coordinates (left, top, right, bottom)
 AVATAR_NAME_CROP = (65, 19, 620, 84)
+WEAPON_NAME_CROP = (1600, 455, 1818, 485)
 
 # Valid character names
 with open('AVATAR_NAMES.json', 'r') as f:
     AVATAR_NAMES = json.load(f)
+
+with open('WEAPON_NAMES.json', 'r') as f:
+    WEAPON_NAMES = json.load(f)
 
 app = FastAPI()
 
@@ -40,7 +44,7 @@ def is_color_in_range(color, target, tolerance=20):
             tb - tolerance <= b <= tb + tolerance)
 
 def avatar_name_to_id(text: str, color: tuple) -> str:
-    cleaned_text = text.strip().replace('\n', '').split()[0]
+    cleaned_text = text.strip().split()[0]
     
     if cleaned_text == "Rover":
         if is_color_in_range(color, (110, 145, 138)): # Aero
@@ -62,6 +66,19 @@ def avatar_name_to_id(text: str, color: tuple) -> str:
     
     return "Unknown"
 
+def weapon_name_to_id(text: str) -> str:
+    cleaned_text = text.strip()
+    
+    if cleaned_text in WEAPON_NAMES:
+        return WEAPON_NAMES[cleaned_text]
+    
+    # If no exact match, try fuzzy matching
+    matches = get_close_matches(cleaned_text, WEAPON_NAMES.keys(), n=1, cutoff=0.8)
+    if matches:
+        return WEAPON_NAMES[matches[0]]
+    
+    return "Unknown"
+
 @app.post("/ocr/")
 async def ocr(file: UploadFile = File(...)):
     contents = await file.read()
@@ -77,13 +94,17 @@ async def ocr(file: UploadFile = File(...)):
     # Process Crops
     avatar_name = image_to_string(image.crop(AVATAR_NAME_CROP))
     avatar_color = get_average_color(image.crop((20, 30, 60, 70)))
+    weapon_name = image_to_string(image.crop(WEAPON_NAME_CROP))
     
     return JSONResponse(content={
         "data": {
-            "id": avatar_name_to_id(avatar_name, avatar_color)
+            "id": avatar_name_to_id(avatar_name, avatar_color),
+            "level": 90,
+            "weaponId": weapon_name_to_id(weapon_name),
         },
         "raw_data": {
-            "id": avatar_name
-        },
-        "color": get_average_color(image.crop((20, 30, 60, 70)))
+            "id": avatar_name,
+            "level": 90,
+            "weaponId": weapon_name
+        }
     })
