@@ -38,49 +38,58 @@ def is_color_in_range(color, target, tolerance=20):
             tg - tolerance <= g <= tg + tolerance and
             tb - tolerance <= b <= tb + tolerance)
 
-def avatar_name_to_id(text: str, color: tuple) -> str:
-    cleaned_text = text.strip().split()[0]
-    
-    if cleaned_text == "Rover":
-        if is_color_in_range(color, (110, 145, 138)): # Aero
-            return "1408"
-        elif is_color_in_range(color, (137, 49, 110)): # Havoc
-            return "1604"
-        elif is_color_in_range(color, (130, 113, 79)): # Spectro
-            return "1502"
-        else:
-            return "Unknown"
-    
-    if cleaned_text in AVATAR_NAMES:
-        return AVATAR_NAMES[cleaned_text]
-    
-    # If no exact match, try fuzzy matching
-    matches = get_close_matches(cleaned_text, AVATAR_NAMES.keys(), n=1, cutoff=0.8)
-    if matches:
-        return AVATAR_NAMES[matches[0]]
-    
-    return "Unknown"
-
-def weapon_name_to_id(text: str) -> str:
+def avatar_name_to_id(text: str, color: tuple) -> str | None:
     cleaned_text = text.strip()
     
+    # Exact matching
+    if cleaned_text in AVATAR_NAMES:
+        if cleaned_text == "Rover":
+            if is_color_in_range(color, (109, 143, 137)): # Aero
+                return "1408"
+            if is_color_in_range(color, (135, 48, 109)): # Havoc
+                return "1604"
+            if is_color_in_range(color, (129, 112, 79)): # Spectro
+                return "1502"
+            return None
+        return AVATAR_NAMES[cleaned_text]
+    
+    # Fuzzy matching
+    matches = get_close_matches(cleaned_text, AVATAR_NAMES.keys(), n=1, cutoff=0.8)
+    if matches:
+        if matches[0] == "Rover":
+            if is_color_in_range(color, (109, 143, 137)): # Aero
+                return "1408"
+            if is_color_in_range(color, (135, 48, 109)): # Havoc
+                return "1604"
+            if is_color_in_range(color, (129, 112, 79)): # Spectro
+                return "1502"
+            return None
+        return AVATAR_NAMES[matches[0]]
+    
+    return None
+
+def weapon_name_to_id(text: str) -> str | None:
+    cleaned_text = text.strip()
+    
+    # Exact matching
     if cleaned_text in WEAPON_NAMES:
         return WEAPON_NAMES[cleaned_text]
     
-    # If no exact match, try fuzzy matching
+    # Fuzzy matching
     matches = get_close_matches(cleaned_text, WEAPON_NAMES.keys(), n=1, cutoff=0.8)
     if matches:
         return WEAPON_NAMES[matches[0]]
     
-    return "Unknown"
+    return None
 
 def mainstat_translate(text: str) -> str | None:
     cleaned_text = text.strip()
     
+    # Exact matching
     if cleaned_text in MAINSTATS:
         return MAINSTATS[cleaned_text]
     
-    # If no exact match, try fuzzy matching
+    # Fuzzy matching
     matches = get_close_matches(cleaned_text, MAINSTATS.keys(), n=1, cutoff=0.8)
     if matches:
         return MAINSTATS[matches[0]]
@@ -90,6 +99,7 @@ def mainstat_translate(text: str) -> str | None:
 def substat_translate(text: str, has_percent: bool) -> str | None:
     cleaned_text = text.strip()
     
+    # Exact matching
     if cleaned_text in SUBSTATS:
         if cleaned_text in ("HP", "ATK", "DEF"):
             if has_percent:
@@ -98,7 +108,7 @@ def substat_translate(text: str, has_percent: bool) -> str | None:
                 return f"_{cleaned_text}"
         return SUBSTATS[cleaned_text]
     
-    # If no exact match, try fuzzy matching
+    # Fuzzy matching
     matches = get_close_matches(cleaned_text, SUBSTATS.keys(), n=1, cutoff=0.8)
     if matches:
         if matches[0] in ("HP", "ATK", "DEF"):
@@ -136,9 +146,16 @@ async def ocr(file: UploadFile = File(...)):
         )
     
     # Process Crops
-    avatar_name = image_to_string(image.crop(CROPS["avatar_name"]))
+    colorMain = get_average_color(image.crop(CROPS["avatar_color"]))
+    color0 = get_average_color(image.crop(CROPS["echo0_set"]))
+    color1 = get_average_color(image.crop(CROPS["echo1_set"]))
+    color2 = get_average_color(image.crop(CROPS["echo2_set"]))
+    color3 = get_average_color(image.crop(CROPS["echo3_set"]))
+    color4 = get_average_color(image.crop(CROPS["echo4_set"]))
+
+    avatar_name = image_to_string(image.crop(CROPS["avatar_name"]), config=custom_config)
     avatar_color = get_average_color(image.crop(CROPS["avatar_color"]))
-    weapon_name = image_to_string(image.crop(CROPS["weapon_name"]))
+    weapon_name = image_to_string(image.crop(CROPS["weapon_name"]), config=custom_config)
     echo0_main = image_to_string(image.crop(CROPS["echo0_main"]), config=custom_config)
     echo0_sub0 = image_to_string(image.crop(CROPS["echo0_sub0"]), config=custom_config)
     echo0_val0 = image_to_string(image.crop(CROPS["echo0_val0"]), config=custom_config)

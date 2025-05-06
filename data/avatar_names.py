@@ -8,9 +8,9 @@ AVATAR_NAMES = {
     "Carlotta": 1107,
     "Camellya": 1603,
     "Lumi": 1504,
-    "The": 1505,
+    "The Shorekeeper": 1505,
     "Youhu": 1106,
-    "Xiangli": 1305,
+    "Xiangli Yao": 1305,
     "Zhezhi": 1105,
     "Jinhsi": 1304,
     "Changli": 1205,
@@ -30,4 +30,5 @@ AVATAR_NAMES = {
     "Lingyang": 1104,
     "Baizhi": 1103,
     "Sanhua": 1102,
+    "Rover": "Rover",
 } 
