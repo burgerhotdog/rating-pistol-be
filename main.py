@@ -181,8 +181,10 @@ def value_translate(text: str) -> tuple[str | None, bool]:
         cleaned_text = cleaned_text[:-1].strip()
 
     try:
-        float(cleaned_text)
-        return cleaned_text, has_percent
+        value = float(cleaned_text)
+        if value.is_integer():
+            return int(value), has_percent
+        return value, has_percent
     except ValueError:
         return None, has_percent
 
