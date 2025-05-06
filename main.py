@@ -190,14 +190,14 @@ def value_translate(text: str) -> tuple[str | None, bool]:
 async def ocr(file: UploadFile = File(...)):
     contents = await file.read()
     image = Image.open(io.BytesIO(contents))
-    
+
     # Verify image dimensions
     if image.size != (1920, 1080):
         return JSONResponse(
             status_code=400,
             content={"error": f"Invalid image dimensions. Expected 1920x1080"}
         )
-    
+
     # Process Crops
     result = cv2.matchTemplate(cv2.cvtColor(np.array(image.crop(CROPS["avatar_name"])), cv2.COLOR_RGB2BGR), nameLV, cv2.TM_CCOEFF_NORMED)
     min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
@@ -206,18 +206,12 @@ async def ocr(file: UploadFile = File(...)):
     top_left = max_loc
     h, w, _ = nameLV.shape
     bottom_right = (top_left[0] + w, top_left[1] + h)
-    avatar_name = image_to_string(image.crop((67, 27, 67 + top_left[0], 87)), config=custom_config)
+    avatar_name = image_to_string(image.crop((71, 23, 65 + top_left[0], 89)), config=custom_config)
     colorMain = get_average_color(image.crop(CROPS["avatar_color"]))
-    
-    echo0_setIcon = cv2.cvtColor(np.array(image.crop(CROPS["echo0_set"])), cv2.COLOR_RGB2BGR)
-    echo1_setIcon = cv2.cvtColor(np.array(image.crop(CROPS["echo1_set"])), cv2.COLOR_RGB2BGR)
-    echo2_setIcon = cv2.cvtColor(np.array(image.crop(CROPS["echo2_set"])), cv2.COLOR_RGB2BGR)
-    echo3_setIcon = cv2.cvtColor(np.array(image.crop(CROPS["echo3_set"])), cv2.COLOR_RGB2BGR)
-    echo4_setIcon = cv2.cvtColor(np.array(image.crop(CROPS["echo4_set"])), cv2.COLOR_RGB2BGR)
 
-    # avatar_name = image_to_string(image.crop(CROPS["avatar_name"]), config=custom_config)
     avatar_color = get_average_color(image.crop(CROPS["avatar_color"]))
     weapon_name = image_to_string(image.crop(CROPS["weapon_name"]), config=custom_config)
+    echo0_setIcon = cv2.cvtColor(np.array(image.crop(CROPS["echo0_set"])), cv2.COLOR_RGB2BGR)
     echo0_main = image_to_string(image.crop(CROPS["echo0_main"]), config=custom_config)
     echo0_sub0 = image_to_string(image.crop(CROPS["echo0_sub0"]), config=custom_config)
     echo0_val0 = image_to_string(image.crop(CROPS["echo0_val0"]), config=custom_config)
@@ -235,6 +229,7 @@ async def ocr(file: UploadFile = File(...)):
     echo0_val4 = image_to_string(image.crop(CROPS["echo0_val4"]), config=custom_config)
     converted0_sub4 = value_translate(echo0_val4)
 
+    echo1_setIcon = cv2.cvtColor(np.array(image.crop(CROPS["echo1_set"])), cv2.COLOR_RGB2BGR)
     echo1_main = image_to_string(image.crop(CROPS["echo1_main"]), config=custom_config)
     echo1_sub0 = image_to_string(image.crop(CROPS["echo1_sub0"]), config=custom_config)
     echo1_val0 = image_to_string(image.crop(CROPS["echo1_val0"]), config=custom_config)
@@ -252,6 +247,7 @@ async def ocr(file: UploadFile = File(...)):
     echo1_val4 = image_to_string(image.crop(CROPS["echo1_val4"]), config=custom_config)
     converted1_sub4 = value_translate(echo1_val4)
     
+    echo2_setIcon = cv2.cvtColor(np.array(image.crop(CROPS["echo2_set"])), cv2.COLOR_RGB2BGR)
     echo2_main = image_to_string(image.crop(CROPS["echo2_main"]), config=custom_config)
     echo2_sub0 = image_to_string(image.crop(CROPS["echo2_sub0"]), config=custom_config)
     echo2_val0 = image_to_string(image.crop(CROPS["echo2_val0"]), config=custom_config)
@@ -269,6 +265,7 @@ async def ocr(file: UploadFile = File(...)):
     echo2_val4 = image_to_string(image.crop(CROPS["echo2_val4"]), config=custom_config)
     converted2_sub4 = value_translate(echo2_val4)
 
+    echo3_setIcon = cv2.cvtColor(np.array(image.crop(CROPS["echo3_set"])), cv2.COLOR_RGB2BGR)
     echo3_main = image_to_string(image.crop(CROPS["echo3_main"]), config=custom_config)
     echo3_sub0 = image_to_string(image.crop(CROPS["echo3_sub0"]), config=custom_config)
     echo3_val0 = image_to_string(image.crop(CROPS["echo3_val0"]), config=custom_config)
@@ -286,6 +283,7 @@ async def ocr(file: UploadFile = File(...)):
     echo3_val4 = image_to_string(image.crop(CROPS["echo3_val4"]), config=custom_config)
     converted3_sub4 = value_translate(echo3_val4)
 
+    echo4_setIcon = cv2.cvtColor(np.array(image.crop(CROPS["echo4_set"])), cv2.COLOR_RGB2BGR)
     echo4_main = image_to_string(image.crop(CROPS["echo4_main"]), config=custom_config)
     echo4_sub0 = image_to_string(image.crop(CROPS["echo4_sub0"]), config=custom_config)
     echo4_val0 = image_to_string(image.crop(CROPS["echo4_val0"]), config=custom_config)
