@@ -302,11 +302,31 @@ async def ocr(file: UploadFile = File(...)):
     converted4_sub4 = value_translate(echo4_val4)
 
     return JSONResponse(content={
+        "id": avatar_name_to_id(avatar_name, avatar_color),
         "data": {
-            "id": avatar_name_to_id(avatar_name, avatar_color),
+            "isStar": False,
             "level": 90,
+            "rank": 0,
             "weaponId": weapon_name_to_id(weapon_name),
             "weaponLevel": 90,
+            "weaponRank": 1,
+            "skillMap": {
+                "001": 10,
+                "002": 10,
+                "003": 10,
+                "004": 10,
+                "005": 10,
+                "101": 1,
+                "102": 1,
+                "201": 1,
+                "202": 1,
+                "203": 1,
+                "204": 1,
+                "205": 1,
+                "206": 1,
+                "207": 1,
+                "208": 1,
+            },
             "equipList": [
                 {
                     "setId": match_icon(echo0_setIcon, templates, mask),
@@ -435,144 +455,6 @@ async def ocr(file: UploadFile = File(...)):
                         {
                             "stat": substat_translate(echo4_sub4, converted4_sub4[1]),
                             "value": converted4_sub4[0],
-                        },
-                    ],
-                },
-            ],
-        },
-        "raw_data": {
-            "id": avatar_name,
-            "level": 90,
-            "weaponId": weapon_name,
-            "weaponLevel": 90,
-            "equipList": [
-                {
-                    "setId": "001",
-                    "stat": echo0_main,
-                    "statList": [
-                        {
-                            "stat": echo0_sub0,
-                            "value": echo0_val0,
-                        },
-                        {
-                            "stat": echo0_sub1,
-                            "value": echo0_val1,
-                        },
-                        {
-                            "stat": echo0_sub2,
-                            "value": echo0_val2,
-                        },
-                        {
-                            "stat": echo0_sub3,
-                            "value": echo0_val3,
-                        },
-                        {
-                            "stat": echo0_sub4,
-                            "value": echo0_val4,
-                        },
-                    ],
-                },
-                {
-                    "setId": "001",
-                    "stat": echo1_main,
-                    "statList": [
-                        {
-                            "stat": echo1_sub0,
-                            "value": echo1_val0,
-                        },
-                        {
-                            "stat": echo1_sub1,
-                            "value": echo1_val1,
-                        },
-                        {
-                            "stat": echo1_sub2,
-                            "value": echo1_val2,
-                        },
-                        {
-                            "stat": echo1_sub3,
-                            "value": echo1_val3,
-                        },
-                        {
-                            "stat": echo1_sub4,
-                            "value": echo1_val4,
-                        },
-                    ],
-                },
-                {
-                    "setId": "001",
-                    "stat": echo2_main,
-                    "statList": [
-                        {
-                            "stat": echo2_sub0,
-                            "value": echo2_val0,
-                        },
-                        {
-                            "stat": echo2_sub1,
-                            "value": echo2_val1,
-                        },
-                        {
-                            "stat": echo2_sub2,
-                            "value": echo2_val2,
-                        },
-                        {
-                            "stat": echo2_sub3,
-                            "value": echo2_val3,
-                        },
-                        {
-                            "stat": echo2_sub4,
-                            "value": echo2_val4,
-                        },
-                    ],
-                },
-                {
-                    "setId": "001",
-                    "stat": echo3_main,
-                    "statList": [
-                        {
-                            "stat": echo3_sub0,
-                            "value": echo3_val0,
-                        },
-                        {
-                            "stat": echo3_sub1,
-                            "value": echo3_val1,
-                        },
-                        {
-                            "stat": echo3_sub2,
-                            "value": echo3_val2,
-                        },
-                        {
-                            "stat": echo3_sub3,
-                            "value": echo3_val3,
-                        },
-                        {
-                            "stat": echo3_sub4,
-                            "value": echo3_val4,
-                        },
-                    ],
-                },
-                {
-                    "setId": "001",
-                    "stat": echo4_main,
-                    "statList": [
-                        {
-                            "stat": echo4_sub0,
-                            "value": echo4_val0,
-                        },
-                        {
-                            "stat": echo4_sub1,
-                            "value": echo4_val1,
-                        },
-                        {
-                            "stat": echo4_sub2,
-                            "value": echo4_val2,
-                        },
-                        {
-                            "stat": echo4_sub3,
-                            "value": echo4_val3,
-                        },
-                        {
-                            "stat": echo4_sub4,
-                            "value": echo4_val4,
                         },
                     ],
                 },
