@@ -1,4 +1,6 @@
 AVATAR_NAMES = {
+    "Cartethyia": "1409",
+    "Lupa": "1207",
     "Zani": "1507",
     "Ciaccona": "1407",
     "Cantarella": "1607",

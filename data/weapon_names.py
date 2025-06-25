@@ -1,4 +1,6 @@
 WEAPON_NAMES = {
+  "Defier's Thorn": "21020056",
+  "Wildfire Mark": "21010036",
   "Blazing Justice": "21040036",
   "Woodland Aria": "21030026",
   "Whispers of Sirens": "21050056",
