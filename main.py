@@ -15,55 +15,6 @@ import numpy as np
 import os
 
 nameLV = cv2.imread('nameLV.webp', cv2.IMREAD_COLOR)
-
-def circular_mask(size=48):
-    y, x = np.ogrid[:size, :size]
-    center = (size - 1) / 2
-    dist_from_center = np.sqrt((x - center) ** 2 + (y - center) ** 2)
-    mask = dist_from_center <= center
-    return mask.astype(np.uint8)
-
-def apply_mask_color(img, mask):
-    masked = np.zeros_like(img)
-    for c in range(3):
-        masked[:, :, c] = cv2.bitwise_and(img[:, :, c], img[:, :, c], mask=mask)
-    return masked
-
-def load_templates(folder_path, size=48):
-    templates = {}
-    mask = circular_mask(size)
-    for filename in sorted(os.listdir(folder_path)):
-        if filename.endswith(".webp"):
-            key = filename.split(".")[0]
-            img = cv2.imread(os.path.join(folder_path, filename), cv2.IMREAD_COLOR)
-            img = cv2.resize(img, (size, size))
-            img = apply_mask_color(img, mask)
-            templates[key] = img
-    return templates
-
-def match_icon(cropped_icon, templates, mask):
-    cropped_icon = apply_mask_color(cropped_icon, mask)
-    best_key = None
-    best_score = -1
-
-    for key, template in templates.items():
-        total_score = 0
-        for c in range(3):
-            result = cv2.matchTemplate(cropped_icon[:, :, c], template[:, :, c], cv2.TM_CCOEFF_NORMED)
-            total_score += result[0][0]
-        avg_score = total_score / 3
-        if avg_score > best_score:
-            best_score = avg_score
-            best_key = key
-    
-    if best_score < 0.8:
-        return None
-
-    return best_key
-
-mask = circular_mask()
-templates = load_templates("icons", size=48)
-
 custom_config = r'--oem 3 --psm 7'
 
 app = FastAPI()
@@ -213,7 +164,7 @@ async def ocr(file: UploadFile = File(...)):
 
     avatar_color = get_average_color(image.crop(CROPS["avatar_color"]))
     weapon_name = image_to_string(image.crop(CROPS["weapon_name"]), config=custom_config)
-    echo0_setIcon = cv2.cvtColor(np.array(image.crop(CROPS["echo0_set"])), cv2.COLOR_RGB2BGR)
+
     echo0_main = image_to_string(image.crop(CROPS["echo0_main"]), config=custom_config)
     echo0_sub0 = image_to_string(image.crop(CROPS["echo0_sub0"]), config=custom_config)
     echo0_val0 = image_to_string(image.crop(CROPS["echo0_val0"]), config=custom_config)
@@ -231,7 +182,6 @@ async def ocr(file: UploadFile = File(...)):
     echo0_val4 = image_to_string(image.crop(CROPS["echo0_val4"]), config=custom_config)
     converted0_sub4 = value_translate(echo0_val4)
 
-    echo1_setIcon = cv2.cvtColor(np.array(image.crop(CROPS["echo1_set"])), cv2.COLOR_RGB2BGR)
     echo1_main = image_to_string(image.crop(CROPS["echo1_main"]), config=custom_config)
     echo1_sub0 = image_to_string(image.crop(CROPS["echo1_sub0"]), config=custom_config)
     echo1_val0 = image_to_string(image.crop(CROPS["echo1_val0"]), config=custom_config)
@@ -249,7 +199,6 @@ async def ocr(file: UploadFile = File(...)):
     echo1_val4 = image_to_string(image.crop(CROPS["echo1_val4"]), config=custom_config)
     converted1_sub4 = value_translate(echo1_val4)
     
-    echo2_setIcon = cv2.cvtColor(np.array(image.crop(CROPS["echo2_set"])), cv2.COLOR_RGB2BGR)
     echo2_main = image_to_string(image.crop(CROPS["echo2_main"]), config=custom_config)
     echo2_sub0 = image_to_string(image.crop(CROPS["echo2_sub0"]), config=custom_config)
     echo2_val0 = image_to_string(image.crop(CROPS["echo2_val0"]), config=custom_config)
@@ -267,7 +216,6 @@ async def ocr(file: UploadFile = File(...)):
     echo2_val4 = image_to_string(image.crop(CROPS["echo2_val4"]), config=custom_config)
     converted2_sub4 = value_translate(echo2_val4)
 
-    echo3_setIcon = cv2.cvtColor(np.array(image.crop(CROPS["echo3_set"])), cv2.COLOR_RGB2BGR)
     echo3_main = image_to_string(image.crop(CROPS["echo3_main"]), config=custom_config)
     echo3_sub0 = image_to_string(image.crop(CROPS["echo3_sub0"]), config=custom_config)
     echo3_val0 = image_to_string(image.crop(CROPS["echo3_val0"]), config=custom_config)
@@ -285,7 +233,6 @@ async def ocr(file: UploadFile = File(...)):
     echo3_val4 = image_to_string(image.crop(CROPS["echo3_val4"]), config=custom_config)
     converted3_sub4 = value_translate(echo3_val4)
 
-    echo4_setIcon = cv2.cvtColor(np.array(image.crop(CROPS["echo4_set"])), cv2.COLOR_RGB2BGR)
     echo4_main = image_to_string(image.crop(CROPS["echo4_main"]), config=custom_config)
     echo4_sub0 = image_to_string(image.crop(CROPS["echo4_sub0"]), config=custom_config)
     echo4_val0 = image_to_string(image.crop(CROPS["echo4_val0"]), config=custom_config)
@@ -307,31 +254,9 @@ async def ocr(file: UploadFile = File(...)):
         "id": avatar_name_to_id(avatar_name, avatar_color),
         "data": {
             "isStar": False,
-            "level": 90,
-            "rank": 0,
             "weaponId": weapon_name_to_id(weapon_name),
-            "weaponLevel": 90,
-            "weaponRank": 1,
-            "skillMap": {
-                "001": 10,
-                "002": 10,
-                "003": 10,
-                "004": 10,
-                "005": 10,
-                "101": 1,
-                "102": 1,
-                "201": 1,
-                "202": 1,
-                "203": 1,
-                "204": 1,
-                "205": 1,
-                "206": 1,
-                "207": 1,
-                "208": 1,
-            },
             "equipList": [
                 {
-                    "setId": match_icon(echo0_setIcon, templates, mask),
                     "stat": mainstat_translate(echo0_main),
                     "statList": [
                         {
@@ -357,7 +282,6 @@ async def ocr(file: UploadFile = File(...)):
                     ],
                 },
                 {
-                    "setId": match_icon(echo1_setIcon, templates, mask),
                     "stat": mainstat_translate(echo1_main),
                     "statList": [
                         {
@@ -383,7 +307,6 @@ async def ocr(file: UploadFile = File(...)):
                     ],
                 },
                 {
-                    "setId": match_icon(echo2_setIcon, templates, mask),
                     "stat": mainstat_translate(echo2_main),
                     "statList": [
                         {
@@ -409,7 +332,6 @@ async def ocr(file: UploadFile = File(...)):
                     ],
                 },
                 {
-                    "setId": match_icon(echo3_setIcon, templates, mask),
                     "stat": mainstat_translate(echo3_main),
                     "statList": [
                         {
@@ -435,7 +357,6 @@ async def ocr(file: UploadFile = File(...)):
                     ],
                 },
                 {
-                    "setId": match_icon(echo4_setIcon, templates, mask),
                     "stat": mainstat_translate(echo4_main),
                     "statList": [
                         {
