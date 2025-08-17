@@ -1,6 +1,6 @@
 # Rating Pistol Backend
 
-This is the backend service for the Rating Pistol application, providing OCR functionality using Tesseract.
+This is the backend server for Rating Pistol, providing OCR functionality for importing Wuthering Waves data using Tesseract.
 
 ## Prerequisites
 
