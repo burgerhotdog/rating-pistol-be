@@ -30,44 +30,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-def get_average_color(image):
-    image = image.convert("RGB").resize((1, 1))  # Collapse to 1x1
-    return image.getpixel((0, 0))  # Get that one averaged pixel
-
-def is_color_in_range(color, target, tolerance=20):
-    r, g, b = color
-    tr, tg, tb = target
-    
-    return (tr - tolerance <= r <= tr + tolerance and
-            tg - tolerance <= g <= tg + tolerance and
-            tb - tolerance <= b <= tb + tolerance)
-
-def avatar_name_to_id(text: str, color: tuple) -> str | None:
+def avatar_name_to_id(text: str) -> str | None:
     cleaned_text = text.strip()
     
     # Exact matching
     if cleaned_text in AVATAR_NAMES:
-        if cleaned_text == "Rover":
-            if is_color_in_range(color, (109, 143, 137)): # Aero
-                return "1408"
-            if is_color_in_range(color, (135, 48, 109)): # Havoc
-                return "1604"
-            if is_color_in_range(color, (129, 112, 79)): # Spectro
-                return "1502"
-            return None
         return AVATAR_NAMES[cleaned_text]
     
     # Fuzzy matching
     matches = get_close_matches(cleaned_text, AVATAR_NAMES.keys(), n=1, cutoff=0.8)
     if matches:
-        if matches[0] == "Rover":
-            if is_color_in_range(color, (109, 143, 137)): # Aero
-                return "1408"
-            if is_color_in_range(color, (135, 48, 109)): # Havoc
-                return "1604"
-            if is_color_in_range(color, (129, 112, 79)): # Spectro
-                return "1502"
-            return None
         return AVATAR_NAMES[matches[0]]
     
     return None
@@ -160,9 +132,6 @@ async def ocr(file: UploadFile = File(...)):
     h, w, _ = nameLV.shape
     bottom_right = (top_left[0] + w, top_left[1] + h)
     avatar_name = image_to_string(image.crop((71, 23, 65 + top_left[0], 89)), config=custom_config)
-    colorMain = get_average_color(image.crop(CROPS["avatar_color"]))
-
-    avatar_color = get_average_color(image.crop(CROPS["avatar_color"]))
     weapon_name = image_to_string(image.crop(CROPS["weapon_name"]), config=custom_config)
 
     echo0_main = image_to_string(image.crop(CROPS["echo0_main"]), config=custom_config)
@@ -251,7 +220,7 @@ async def ocr(file: UploadFile = File(...)):
     converted4_sub4 = value_translate(echo4_val4)
 
     return JSONResponse(content={
-        "id": avatar_name_to_id(avatar_name, avatar_color),
+        "id": avatar_name_to_id(avatar_name),
         "data": {
             "isStar": False,
             "weaponId": weapon_name_to_id(weapon_name),

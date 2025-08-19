@@ -33,5 +33,4 @@ AVATAR_NAMES = {
     'Lingyang': '1104',
     'Baizhi': '1103',
     'Sanhua': '1102',
-    'Rover': 'Rover',
 }
