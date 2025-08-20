@@ -44,7 +44,7 @@ def avatar_name_to_id(text: str) -> str | None:
     
     return None
 
-def weapon_name_to_id(text: str) -> str | None:
+def weapon_name_to_id(text: str) -> int | None:
     cleaned_text = text.strip()
     
     # Exact matching
@@ -96,7 +96,7 @@ def substat_translate(text: str, has_percent: bool) -> str | None:
     
     return None
 
-def value_translate(text: str) -> tuple[str | None, bool]:
+def value_translate(text: str) -> tuple[int | float | None, bool]:
     cleaned_text = text.strip()
     has_percent = cleaned_text.endswith('%')
 
