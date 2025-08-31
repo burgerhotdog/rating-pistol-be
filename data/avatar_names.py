@@ -1,4 +1,6 @@
 AVATAR_NAMES = {
+    'Iuno': '1410',
+    'Augusta': '1306',
     'Phrolova': '1608',
     'Cartethyia': '1409',
     'Lupa': '1207',

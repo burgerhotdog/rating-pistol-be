@@ -1,34 +1,14 @@
-# Rating Pistol Backend
+## Setup
 
-This is the backend server for Rating Pistol, providing OCR functionality for importing Wuthering Waves data using Tesseract.
-
-## Prerequisites
-
-1. Python 3.9 or higher
-2. Tesseract OCR installed on your system
-   - For Windows: Download and install from https://github.com/UB-Mannheim/tesseract/wiki
-   - For Mac: `brew install tesseract`
-   - For Linux: `sudo apt-get install tesseract-ocr`
-
-## Local Development Setup
-
-1. Create a virtual environment:
+1. Build the image:
 ```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+docker build -t rating-pistol-be .
 ```
 
-2. Install dependencies:
+2. Run the container:
 ```bash
-pip install -r requirements.txt
+docker run -p 8000:80 -v $(pwd):/app rating-pistol-be
 ```
-
-3. Run the server:
-```bash
-uvicorn app:app --reload
-```
-
-The server will start at http://localhost:8000
 
 ## Testing the API
 
@@ -40,22 +20,8 @@ curl -X POST -F "file=@path/to/your/image.jpg" http://localhost:8000/ocr/
 
 Or visit http://localhost:8000/docs for the interactive Swagger documentation.
 
-## CORS Configuration
+## CORS config
 
-The backend is configured to accept requests from:
+Accepts requests from:
 - https://burgerhotdog.github.io/rating-pistol/
 - http://localhost:5173/rating-pistol/
-
-## Docker Support
-
-To run with Docker:
-
-1. Build the image:
-```bash
-docker build -t rating-pistol-be .
-```
-
-2. Run the container:
-```bash
-docker run -p 8000:80 -v $(pwd):/app rating-pistol-be
-```

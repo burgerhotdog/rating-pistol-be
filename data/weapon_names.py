@@ -1,4 +1,11 @@
 WEAPON_NAMES = {
+    'Radiant Dawn': 21050104,
+    'Aether Strike': 21040104,
+    'Moongazer\'s Sigil': 21040046,
+    'Solar Flame': 21030104,
+    'Feather Edge': 21020104,
+    'Aureate Zenith': 21010104,
+    'Thunderflare Dominion': 21010046,
     'Lethean Elegy': 21050066,
     'Defier\'s Thorn': 21020056,
     'Wildfire Mark': 21010036,
