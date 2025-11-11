@@ -1,4 +1,6 @@
 WEAPON_NAMES = {
+    'Lux & Umbra': 21030036,
+    'Emerald Sentence': 21020066,
     'Radiant Dawn': 21050104,
     'Aether Strike': 21040104,
     'Moongazer\'s Sigil': 21040046,
