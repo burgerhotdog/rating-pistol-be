@@ -1,4 +1,5 @@
 WEAPON_NAMES = {
+    'Kumokiri': 21010056,
     'Lux & Umbra': 21030036,
     'Emerald Sentence': 21020066,
     'Radiant Dawn': 21050104,

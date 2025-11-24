@@ -1,4 +1,6 @@
 AVATAR_NAMES = {
+    'Chisa': '1508',
+    'Buling': '1307',
     'Qiuyuan': '1411',
     'Galbrena': '1208',
     'Iuno': '1410',
