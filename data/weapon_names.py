@@ -1,4 +1,11 @@
 WEAPON_NAMES = {
+    'Boson Astrolabe': 21050045,
+    'Pulsation Bracer': 21040045,
+    'Spectrum Blaster': 21030046,
+    'Phasic Homogenizer': 21030045,
+    'Laser Shearer': 21020045,
+    'Starfield Calibrator': 21010066,
+    'Radiance Cleaver': 21010045,
     'Kumokiri': 21010056,
     'Lux & Umbra': 21030036,
     'Emerald Sentence': 21020066,
