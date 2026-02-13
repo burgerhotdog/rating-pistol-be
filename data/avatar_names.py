@@ -1,4 +1,6 @@
 AVATAR_NAMES = {
+    'Luuk Herssen': '1510',
+    'Aemeath': '1210',
     'Lynae': '1509',
     'Mornye': '1209',
     'Chisa': '1508',

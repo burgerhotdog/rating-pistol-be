@@ -1,4 +1,6 @@
 WEAPON_NAMES = {
+    'Daybreaker\'s Spine': 21040056,
+    'Everbright Polestar': 21020076,
     'Boson Astrolabe': 21050045,
     'Pulsation Bracer': 21040045,
     'Spectrum Blaster': 21030046,
